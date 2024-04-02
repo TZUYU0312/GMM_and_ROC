@@ -83,28 +83,29 @@ function ROC_test(data,delta)
             end
         end
     end
-    return p_count,n_count
+    return p_count/(size(data,1)*6),n_count/(size(data,1)*6)
 end
 
 #先用w2跟w3的資料
-class1_g1, class1_g2 = cal_prob(data6[:, 1:7])
+class1_g1, class1_g2 = cal_prob(data6[:, 1:7])#P
 Gau_data1 = cal_b(class1_g1,class1_g2,mean1_w1,mean2_w1,std1_w1,std2_w1)
 
-class2_g1, class2_g2 = cal_prob(data12[:, 1:7])
+class2_g1, class2_g2 = cal_prob(data12[:, 1:7])#N
 Gau_data2 = cal_b(class2_g1,class2_g2,mean1_w2,mean2_w2,std1_w2,std2_w2)
 
-PN_data = vcat(Gau_data1,Gau_data2)
+PN_data = vcat(Gau_data1,Gau_data2) #P+N
 
 #P = w1 N = w2 delta=0.7  data>0.7 = p  data<0.7 =N
 global TPR = []
 global FPR = []
-for delta in 0.75:0.001:10
+for delta in 0.75:0.001:5
     P_count_P,N_count_P = ROC_test(Gau_data1[:,1:6],delta)
     P_count_N,N_count_N = ROC_test(Gau_data2[:,1:6],delta)
-    push!(TPR,P_count_P)
+    #push!(TPR,P_count_P/size(Gau_data1,1))
+    push!(TPR,N_count_P)
     push!(FPR,P_count_N)
     #println(P_count_P/P_count_N)
 end
 
 plot!()
-scatter!(FPR, TPR, label="ROC")
+scatter!(FPR, TPR, label="EER")
